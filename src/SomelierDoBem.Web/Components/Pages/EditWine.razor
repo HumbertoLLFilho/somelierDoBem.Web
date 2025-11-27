@@ -20,20 +20,6 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Cor</label>
-        <div class="wine-color-carousel">
-            @foreach (var color in WineColors)
-            {
-                <div class="wine-color-option @(Model.Color == color.Name ? "selected" : "")" 
-                     @onclick="() => Model.Color = color.Name">
-                    <div class="color-circle" style="background-color: @color.HexCode;"></div>
-                    <span class="color-label">@color.Name</span>
-                </div>
-            }
-        </div>
-    </div>
-
-    <div class="mb-3">
         <label for="country" class="form-label">País</label>
         <InputSelect id="country" class="form-select" @bind-Value="Model.Country">
             <option value="">Selecione um País</option>
@@ -72,6 +58,20 @@
     <div class="mb-3">
         <label for="region" class="form-label">Região</label>
         <InputText id="region" class="form-control" @bind-Value="Model.Region" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cor</label>
+        <div class="wine-color-carousel">
+            @foreach (var color in WineColors)
+            {
+                <div class="wine-color-option @(Model.Color == color.Name ? "selected" : "")" 
+                     @onclick="() => Model.Color = color.Name">
+                    <div class="color-circle" style="background-color: @color.HexCode;"></div>
+                    <span class="color-label">@color.Name</span>
+                </div>
+            }
+        </div>
     </div>
 
     <div class="mb-3">
@@ -149,26 +149,6 @@
         font-weight: 600;
         color: var(--brown);
     }
-
-    .form-control, .form-select {
-        background-color: rgba(255, 255, 255, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: var(--brown) !important;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-    }
-
-    .form-control:focus, .form-select:focus {
-        background-color: rgba(255, 255, 255, 0.6) !important;
-        border-color: var(--caramel);
-        box-shadow: 0 0 0 0.25rem rgba(185, 122, 87, 0.25);
-        color: var(--brown) !important;
-    }
-
-    textarea.form-control {
-        background-color: rgba(255, 255, 255, 0.4) !important;
-    }
-
 </style>
 
 @code {
