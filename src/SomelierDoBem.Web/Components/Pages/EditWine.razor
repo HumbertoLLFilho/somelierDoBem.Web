@@ -1,0 +1,268 @@
+@page "/wines/new"
+@page "/wines/edit/{Id:guid}"
+@inject CreateWineUseCase CreateWine
+@inject UpdateWineUseCase UpdateWine
+@inject GetWineByIdUseCase GetWineById
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>@Title</PageTitle>
+
+<h1>@Title</h1>
+
+<EditForm Model="@Model" OnValidSubmit="HandleValidSubmit" FormName="WineForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Nome do Vinho</label>
+        <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cor</label>
+        <div class="wine-color-carousel">
+            @foreach (var color in WineColors)
+            {
+                <div class="wine-color-option @(Model.Color == color.Name ? "selected" : "")" 
+                     @onclick="() => Model.Color = color.Name">
+                    <div class="color-circle" style="background-color: @color.HexCode;"></div>
+                    <span class="color-label">@color.Name</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="country" class="form-label">País</label>
+        <InputSelect id="country" class="form-select" @bind-Value="Model.Country">
+            <option value="">Selecione um País</option>
+            <option value="França">França</option>
+            <option value="Itália">Itália</option>
+            <option value="Espanha">Espanha</option>
+            <option value="Portugal">Portugal</option>
+            <option value="Chile">Chile</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Brasil">Brasil</option>
+            <option value="Estados Unidos">Estados Unidos</option>
+            <option value="Austrália">Austrália</option>
+            <option value="África do Sul">África do Sul</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="variety" class="form-label">Tipo da Uva</label>
+        <InputSelect id="variety" class="form-select" @bind-Value="Model.Variety">
+            <option value="">Selecione uma Uva</option>
+            <option value="Cabernet Sauvignon">Cabernet Sauvignon</option>
+            <option value="Merlot">Merlot</option>
+            <option value="Pinot Noir">Pinot Noir</option>
+            <option value="Syrah/Shiraz">Syrah/Shiraz</option>
+            <option value="Chardonnay">Chardonnay</option>
+            <option value="Sauvignon Blanc">Sauvignon Blanc</option>
+            <option value="Riesling">Riesling</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="year" class="form-label">Ano</label>
+        <InputNumber id="year" class="form-control" @bind-Value="Model.Year" />
+    </div>
+
+    <div class="mb-3">
+        <label for="region" class="form-label">Região</label>
+        <InputText id="region" class="form-control" @bind-Value="Model.Region" />
+    </div>
+
+    <div class="mb-3">
+        <label for="acidity" class="form-label">Acidez</label>
+        <InputSelect id="acidity" class="form-select" @bind-Value="Model.Acidity">
+            <option value="">Selecione...</option>
+            <option value="Baixa">Baixa</option>
+            <option value="Média">Média</option>
+            <option value="Alta">Alta</option>
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descrição</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="Model.Description" rows="4" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="wines" class="btn btn-secondary">Cancelar</a>
+</EditForm>
+
+<style>
+    .wine-color-carousel {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+    }
+
+    .wine-color-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .wine-color-option:hover {
+        background: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .wine-color-option.selected {
+        border-color: var(--deep-wine);
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 12px rgba(110, 26, 26, 0.2);
+    }
+
+    .color-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .color-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--brown);
+    }
+
+    h1 {
+        color: var(--deep-wine);
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--brown);
+    }
+
+    .form-control, .form-select {
+        background-color: rgba(255, 255, 255, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--brown) !important;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.6) !important;
+        border-color: var(--caramel);
+        box-shadow: 0 0 0 0.25rem rgba(185, 122, 87, 0.25);
+        color: var(--brown) !important;
+    }
+
+    textarea.form-control {
+        background-color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+</style>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public WineViewModel Model { get; set; } = new();
+
+    private string Title => Id.HasValue ? "Editar Vinho" : "Novo Vinho";
+
+    private List<WineColor> WineColors = new()
+    {
+        new WineColor { Name = "Tinto", HexCode = "#722F37" },
+        new WineColor { Name = "Branco", HexCode = "#F4E8C1" },
+        new WineColor { Name = "Rosé", HexCode = "#FFB6C1" },
+        new WineColor { Name = "Laranja", HexCode = "#FF8C42" },
+        new WineColor { Name = "Espumante", HexCode = "#FFF8DC" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+            var wine = await GetWineById.ExecuteAsync(Id.Value);
+            if (wine != null)
+            {
+                Model = new WineViewModel
+                {
+                    Name = wine.Name,
+                    Variety = wine.Variety,
+                    Year = wine.Year,
+                    Region = wine.Region,
+                    Country = wine.Country,
+                    Description = wine.Description,
+                    Color = wine.Color,
+                    Acidity = wine.Acidity
+                };
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id.HasValue)
+        {
+            var updateDto = new UpdateWineDto
+            {
+                Id = Id.Value,
+                Name = Model.Name,
+                Variety = Model.Variety,
+                Year = Model.Year,
+                Region = Model.Region,
+                Country = Model.Country,
+                Description = Model.Description,
+                Color = Model.Color,
+                Acidity = Model.Acidity
+            };
+            await UpdateWine.ExecuteAsync(updateDto);
+        }
+        else
+        {
+            var createDto = new CreateWineDto
+            {
+                Name = Model.Name,
+                Variety = Model.Variety,
+                Year = Model.Year,
+                Region = Model.Region,
+                Country = Model.Country,
+                Description = Model.Description,
+                Color = Model.Color,
+                Acidity = Model.Acidity
+            };
+            await CreateWine.ExecuteAsync(createDto);
+        }
+
+        Navigation.NavigateTo("wines");
+    }
+
+    public class WineViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Variety { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public string Region { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Color { get; set; } = string.Empty;
+        public string Acidity { get; set; } = string.Empty;
+    }
+
+    public class WineColor
+    {
+        public string Name { get; set; } = string.Empty;
+        public string HexCode { get; set; } = string.Empty;
+    }
+}

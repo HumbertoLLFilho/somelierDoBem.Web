@@ -1,0 +1,171 @@
+@page "/wines"
+@inject GetAllWinesUseCase GetAllWines
+@inject DeleteWineUseCase DeleteWine
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<style>
+
+    /* ===========================
+       EFEITO GLASS DO WRAPPER
+       ===========================*/
+    .glass-card {
+        background: linear-gradient(180deg, rgba(255,245,225,0.46), rgba(255,245,225,0.40));
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 6px 18px rgba(34,34,34,0.08), inset 0 1px 0 rgba(255,255,255,0.25);
+        border: 1px solid rgba(255,255,255,0.22);
+        backdrop-filter: blur(6px) saturate(1.03);
+        -webkit-backdrop-filter: blur(6px) saturate(1.03);
+        transition: box-shadow .18s ease, transform .12s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(34,34,34,0.10), inset 0 1px 0 rgba(255,255,255,0.30);
+    }
+
+    /* ===========================
+       AJUSTES DA TABELA (Bootstrap)
+       ===========================*/
+    .glass-card .table {
+        background-color: transparent !important; /* impede bootstrap de sobrescrever o fundo */
+        margin-bottom: 0;
+    }
+
+    /* header */
+    .glass-card .table thead {
+        background: rgba(92,15,15,0.92); /* marrom da sua UI */
+        color: #fff !important;
+    }
+
+    .glass-card .table thead th {
+        vertical-align: middle;
+        font-weight: 700;
+        padding: 14px 12px;
+        color: #fff !important;
+    }
+
+    .glass-card .table thead th:first-child {
+        border-top-left-radius: 8px;
+    }
+
+    .glass-card .table thead th:last-child {
+        border-top-right-radius: 8px;
+    }
+
+    /* linhas */
+    .glass-card .table tbody tr {
+        background: transparent;
+        border-top: none;
+    }
+
+    .glass-card .table tbody tr:hover {
+        background: rgba(255,255,250,0.20);
+    }
+
+    .glass-card .table td, 
+    .glass-card .table th {
+        padding: 14px 12px;
+        vertical-align: middle;
+        border-top: none;
+        border-bottom: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        background-color: transparent !important;
+        color: var(--brown) !important;
+    }
+
+    .glass-card .table td.text-end {
+        white-space: nowrap;
+    }
+
+    /* Remove todas as bordas da tabela */
+    .glass-card .table {
+        border-collapse: collapse;
+        border: none !important;
+    }
+
+    .glass-card .table tbody {
+        border: none !important;
+    }
+
+
+</style>
+
+
+<h1>Wines</h1>
+
+<p>
+    <a href="wines/new" class="btn btn-primary">Create New Wine</a>
+</p>
+
+<!-- ===========================
+     WRAPPER COM O EFEITO GLASS
+     ===========================-->
+
+<div class="glass-card">
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Uva</th>
+                    <th>Ano</th>
+                    <th>Região</th>
+                    <th>País</th>
+                    <th>Cor</th>
+                    <th>Acidez</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (wines is not null)
+                {
+                    foreach (var wine in wines)
+                    {
+                        <tr>
+                            <td>@wine.Name</td>
+                            <td>@wine.Variety</td>
+                            <td>@wine.Year</td>
+                            <td>@wine.Region</td>
+                            <td>@wine.Country</td>
+                            <td>@wine.Color</td>
+                            <td>@wine.Acidity</td>
+                            <td>
+                                <a href="wines/edit/@wine.Id" class="btn btn-secondary btn-sm">Edit</a>
+                                <button class="btn btn-danger btn-sm" @onclick="() => Delete(wine.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    private IEnumerable<WineDto>? wines;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWines();
+    }
+
+    private async Task LoadWines()
+    {
+        wines = await GetAllWines.ExecuteAsync();
+    }
+
+    private async Task Delete(Guid id)
+    {
+        if (await Task.FromResult(true)) // In a real app, show confirmation dialog
+        {
+            await DeleteWine.ExecuteAsync(id);
+            await LoadWines();
+        }
+    }
+}
